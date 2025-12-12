@@ -28,6 +28,59 @@ class Math:
             counter += self.calculate_col(j)
         return counter
     
+class Math2:
+    """Class to solve part 2 of the puzzle"""
+    def __init__(self, path):
+        self.matrix = []
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.replace("\n", "")
+                self.matrix.append(line)
+        for row in self.matrix:
+            print(row)
+
+    def col_num(self, j:int) -> int:
+        num_string = ""
+        for i in range(len(self.matrix) - 1):
+            num_string += self.matrix[i][j]
+        num_string = num_string.strip()
+        if num_string == "":
+            return None
+        else:
+            return int(num_string)
+
+    def sum_of_all_cols(self):
+        total_counter = 0
+        counter = 0
+        operation = None
+        for j in range(len(self.matrix[0])):
+            if self.matrix[-1][j] == "*":
+                total_counter += counter
+                counter = 1
+                operation = "*"
+                num = self.col_num(j)
+                if num:
+                    counter *= num
+            elif self.matrix[-1][j] == "+":
+                total_counter += counter
+                counter = 0
+                operation = "+"
+                num = self.col_num(j)
+                if num:
+                    counter += num
+            elif operation == "+":
+                num = self.col_num(j)
+                if num:
+                    counter += num
+            else:
+                num = self.col_num(j)
+                if num:
+                    counter *= num
+        total_counter += counter
+        return total_counter
+
 path = os.path.join(os.path.dirname(__file__), "day6_2.txt")
-math = Math(path)
+#math = Math(path)
+#print(math.sum_of_all_cols())
+math = Math2(path)
 print(math.sum_of_all_cols())
