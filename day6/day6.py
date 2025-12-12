@@ -36,8 +36,6 @@ class Math2:
             for line in f:
                 line = line.replace("\n", "")
                 self.matrix.append(line)
-        for row in self.matrix:
-            print(row)
 
     def col_num(self, j:int) -> int:
         num_string = ""
