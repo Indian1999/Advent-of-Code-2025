@@ -1,4 +1,5 @@
 import os
+from functools import cache
 
 class Manifold:
     def __init__(self, path):
@@ -18,19 +19,19 @@ class Manifold:
         raise Exception("Starting position not found!")
     
     def calculate_splits(self):
+        """solves part 2"""
         i, j = self.find_start()
         splits = self.move_beam(i, j)
         return splits
     
+    @cache
     def move_beam(self, i, j):
         if i >= self.n or j < 0 or j >= self.m:
             return 0
         if self.matrix[i][j] == "^":
-            self.matrix[i][j] = "#"
-            #self.matrix[i][j] = "." # To avoid double counts
+            #self.matrix[i][j] = "." # To avoid double counts (good for part 2 maybe? yes)
             return 1 + self.move_beam(i, j-1) + self.move_beam(i, j+1)
-        if self.matrix[i][j] == ".":
-            self.matrix[i][j] = "|"
+        print(i, j)
         return self.move_beam(i+1, j)
     
     def count_char(self, char):
@@ -63,6 +64,7 @@ class Manifold:
         return False
     
     def calculate_splits_2(self):
+        """solves part 1"""
         counter = 0
         for i in range(self.n):
             for j in range(self.m):
@@ -72,7 +74,7 @@ class Manifold:
 
 path = os.path.join(os.path.dirname(__file__), "day7_2.txt")
 manifold = Manifold(path)
-print(manifold.calculate_splits_2())
+print(manifold.calculate_splits() + 1)
 #manifold.print_matrix()
 #print(manifold.count_char("#"))
 
@@ -81,4 +83,4 @@ print(manifold.calculate_splits_2())
 #   1751
 # correct: 1651
 
-# part2:
+# part2: correct: 108924003331749
