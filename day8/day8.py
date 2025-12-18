@@ -86,7 +86,8 @@ class Space:
         return min_ids
 
     def merge_two_circuits(self, i, j):
-        self.circuits[i] = self.circuits[i] + self.circuits.pop(j)
+        self.circuits[i] = self.circuits[i] + self.circuits[j]
+        del self.circuits[j]
 
     def is_same_circuit(self, a, b):
         for i in range(len(self.circuits)):
@@ -112,6 +113,9 @@ class Space:
                     self.get_circuit_by_point(self.points[a[1]])
                 )
             merge_counter += 1
+            print("#"*50)
+            print(self)
+            print("#"*50)
 
     def calculate_value(self):
         self.merge_circuits(n_merges = 10)
@@ -122,7 +126,7 @@ class Space:
         return value
 
 
-PATH = os.path.join(os.path.dirname(__file__), "day8_1.txt")
+PATH = os.path.join(os.path.dirname(__file__), "day8_2.txt")
 space = Space(PATH)
 print(space.calculate_value())
 
