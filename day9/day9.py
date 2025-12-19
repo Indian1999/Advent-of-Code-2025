@@ -1,5 +1,7 @@
 import os
+import time
 from math import fabs
+from pprint import pprint
 
 PATH = os.path.join(os.path.dirname(__file__), "day9_2.txt")
 data = []
@@ -84,22 +86,27 @@ class Floor:
                 dy += 1
         self.edge_tiles = self.red_tiles + self.green_tiles
         self.inner_tiles = []
+        # The following part is way too slow, this needs to be rwwritten, takes aprox. 12 hours to complete
+        i = 0
+        start = time.perf_counter()
         for x, y in self.green_tiles:
+            if i % 50 == 0:
+                print(f"{i}/{len(self.green_tiles)}")
+                print(f"Elapsed time: {time.perf_counter()-start}")
+                start = time.perf_counter()
+            i+= 1
             if (x-1, y) in self.edge_tiles and (x+1, y) in self.edge_tiles: # Search y
                 opposite = self.find_opposite((x, y), axis = 0)
                 if opposite[1] > y:
-                    self.inner_tiles += [(x, i) for i in range(y+1, opposite[1])]
+                    self.inner_tiles.append({"fixed_axis": "x", "x": x, "y": (y+1, opposite[1]-1)})
                 else:
-                    self.inner_tiles += [(x, i) for i in range(opposite[1]+1, y)]
+                    self.inner_tiles.append({"fixed_axis": "x", "x": x, "y": (opposite[1]+1, y-1)})
             if (x, y-1) in self.edge_tiles and (x, y+1) in self.edge_tiles: # Search x
                 opposite = self.find_opposite((x, y), axis = 1)
                 if opposite[0] > x:
-                    self.inner_tiles += [(i, y) for i in range(x+1, opposite[0])]
+                    self.inner_tiles.append({"fixed_axis": "y", "x": (x+1, opposite[0]-1), "y": y})
                 else:
-                    self.inner_tiles += [(i, y) for i in range(opposite[0]+1, x)]
-
-        # Self.inner_tiles is not perfect, it shows some outer edges, but it will do for this task        
-        self.tiles = list(set(self.inner_tiles + self.edge_tiles))
+                    self.inner_tiles.append({"fixed_axis": "y", "x": (opposite[0]+1, x-1), "y": y})
 
     def find_opposite(self, pos, axis):
         for tile in self.edge_tiles:
@@ -115,15 +122,19 @@ class Floor:
             lines[x][y] = "#"
         for x,y in self.green_tiles:
             lines[x][y] = "O"
-        for x,y in self.inner_tiles:
-            print(x,y)
-            try:
-                lines[x][y] = "U"
-            except Exception as ex:
-                print(ex, "on:", (x,y))
         lines = ["".join(line) + "\n" for line in lines]
         with open(path, "w", encoding="utf-8") as f:
             f.writelines(lines)
+
+    def coord_inside_area(self, pos):
+        if pos in self.edge_tiles:
+            return True
+        for tile in self.inner_tiles:
+            if tile["fixed_axis"] == "x" and pos[0] == tile["x"] and pos[1] >= tile["y"][0] and pos[1] <= tile["y"][1]:
+                return True
+            if tile["fixed_axis"] == "y" and pos[1] == tile["y"] and pos[0] >= tile["x"][0] and pos[0] <= tile["x"][0]:
+                return True
+        return False
 
 
     def rect_area(self, a, b):
@@ -134,7 +145,7 @@ class Floor:
         from_1, to_1 = min(a[1], b[1]), max(a[1], b[1])
         for i in range(from_0, to_0 + 1):
             for j in range(from_1, to_1+1):
-                if (i,j) not in self.tiles:
+                if not self.coord_inside_area((i,j)):
                     return False
         return True
     
@@ -149,14 +160,13 @@ class Floor:
                         max = area
         return max
             
-
-"""
-Current state:
-works in theory, but consumes way too much memory, to solve we could try not saving the inner_tiles inside a variable
-but calculate wheter a point is inside a rectangle on the fly
-"""
 floor = Floor(data)
-floor.export()
+#floor.export()
 print(floor.find_largest_area())
+#for i in range(floor.maxX+1):
+#    for j in range(floor.maxY+1):
+#        print("#" if floor.coord_inside_area((i,j)) else ".", end="")
+#    print()
+#pprint(floor.inner_tiles)
 
 
