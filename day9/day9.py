@@ -160,6 +160,10 @@ class Floor:
                         max = area
         return max
             
+"""
+TODO:
+fix the constructor of Floor so it does not take 2 moon cycles to calculate
+"""
 floor = Floor(data)
 #floor.export()
 print(floor.find_largest_area())
